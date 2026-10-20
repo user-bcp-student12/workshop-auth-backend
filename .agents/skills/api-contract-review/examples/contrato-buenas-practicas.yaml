@@ -1,0 +1,127 @@
+openapi: 3.1.0
+info:
+  title: API de pedidos de ejemplo
+  version: 1.0.0
+  description: Contrato sintetico conforme para probar el estado APROBADO.
+
+x-convenciones-aprobadas-para-esta-prueba:
+  fuente: Convenciones ficticias incluidas unicamente para este ejercicio.
+  tipo-contenido-de-error: application/problem+json
+  campos-obligatorios-de-error:
+    - code
+    - message
+    - requestId
+  respuestas-sin-cuerpo:
+    - 204
+
+paths:
+  /v1/orders:
+    post:
+      operationId: createOrder
+      summary: Crear un pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrder'
+            example:
+              productCode: BOOK-42
+              quantity: 2
+      responses:
+        '201':
+          description: Pedido creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                id: 1042
+                status: PENDING
+                createdAt: "2026-10-20T10:00:00Z"
+        '400':
+          description: Solicitud no valida
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                code: INVALID_REQUEST
+                message: La solicitud no cumple el contrato.
+                requestId: req-example-001
+        '422':
+          description: Datos semanticamente invalidos
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                code: INVALID_QUANTITY
+                message: La cantidad debe ser mayor que cero.
+                requestId: req-example-002
+
+  /v1/orders/{orderId}:
+    delete:
+      operationId: deleteOrder
+      summary: Eliminar un pedido
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Pedido eliminado; la respuesta no tiene cuerpo.
+
+components:
+  schemas:
+    CreateOrder:
+      type: object
+      additionalProperties: false
+      required:
+        - productCode
+        - quantity
+      properties:
+        productCode:
+          type: string
+          minLength: 1
+        quantity:
+          type: integer
+          minimum: 1
+    Order:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - status
+        - createdAt
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+        createdAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+        - requestId
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+        requestId:
+          type: string
+          minLength: 1

@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: API de pedidos de ejemplo
+  version: 1.0.0
+  description: Contrato sintetico con errores intencionales para probar api-contract-review.
+
+x-convenciones-aprobadas-para-esta-prueba:
+  fuente: Convenciones ficticias incluidas unicamente para este ejercicio.
+  tipo-contenido-de-error: application/problem+json
+  campos-obligatorios-de-error:
+    - code
+    - message
+    - requestId
+  respuestas-sin-cuerpo:
+    - 204
+
+paths:
+  /v1/orders:
+    post:
+      operationId: createOrder
+      summary: Crear un pedido
+      responses:
+        '201':
+          description: Pedido creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              example:
+                id: "order-1042"
+                status: CREATED
+                createdAt: "2026-10-20T10:00:00Z"
+        '400':
+          description: Solicitud no valida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                message: Solicitud no valida
+
+  /v1/orders/{orderId}:
+    delete:
+      operationId: deleteOrder
+      summary: Eliminar un pedido
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Pedido eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                deleted: true
+
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - id
+        - status
+        - createdAt
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+        createdAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+        - code
+        - message
+        - requestId
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        requestId:
+          type: string
