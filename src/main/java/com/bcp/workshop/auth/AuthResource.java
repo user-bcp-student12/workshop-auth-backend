@@ -19,6 +19,9 @@ public class AuthResource {
     @Inject
     LegacyDatabase database;
 
+    @Inject
+    AuthTokenService tokenService;
+
     @POST
     @Path("/login")
     public Response login(LoginRequest request) {
@@ -36,10 +39,14 @@ public class AuthResource {
                         if (user == null) {
                             return Response.status(401).entity(Map.of("message", "Invalid user " + request.username + " or password")).build();
                         } else {
-                            String token = LegacyTokenUtil.create(user.username(), user.role());
+                            String client = request.client == null ? "angular-workshop" : request.client;
+                            if (!tokenService.isClientAllowed(client)) {
+                                return Response.status(400).entity(Map.of("message", "Client is not allowed")).build();
+                            }
+                            String token = tokenService.create(user.username(), client, user.role());
                             Map<String, Object> response = new HashMap<>();
                             response.put("token", token);
-                            response.put("expiresIn", 3600);
+                            response.put("expiresIn", AuthTokenService.TOKEN_TTL_SECONDS);
                             response.put("user", Map.of(
                                     "username", user.username(),
                                     "displayName", StringEscapeUtils.escapeHtml4(user.displayName()),
