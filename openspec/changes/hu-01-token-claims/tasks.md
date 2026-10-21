@@ -51,9 +51,9 @@
 
 ## 7. Validación de `client`
 
-- [ ] 7.1 Definir la lista de clientes permitidos en configuración, con `angular-workshop` como valor de laboratorio.
-- [ ] 7.2 Añadir prueba: `client` no permitido responde 400 y no emite token.
-- [ ] 7.3 Implementar y probar que `client` ausente usa `angular-workshop` como valor por defecto.
+- [x] 7.1 Definir la lista de clientes permitidos en configuración, con `angular-workshop` como valor de laboratorio.
+- [x] 7.2 Añadir prueba: `client` no permitido responde 400 y no emite token.
+- [x] 7.3 Implementar y probar que `client` ausente usa `angular-workshop` como valor por defecto.
 
 ## 8. Logs sin valores sensibles
 
